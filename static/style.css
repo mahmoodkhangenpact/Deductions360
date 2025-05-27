@@ -1,0 +1,1005 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.header {
+    background-color: #141401;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: calc(100% - 250px);
+    box-sizing: border-box;
+    position: fixed;  /* Make header stick to the top */
+    top: 0;
+    left: 0;
+    z-index: 1000;  /* Ensure it's on top of other elements */
+    margin-left: 250px; /* Position header after the sidebar */
+}
+
+.header-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    margin: 0;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.header-logo {
+    height: 45px;
+    margin: 0 10px;
+}
+
+.user-info {
+    margin-right: 10px;
+    font-size: 1rem;
+    color: #ffffff;
+}
+
+.login-logout-button {
+    padding: 8px 16px;
+    background-color: #2e2f30;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.login-logout-button:hover {
+    background-color: #0056b3;
+}
+
+.main-content {
+    margin-top: 40px; /* Adjust this if header height changes */
+}
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid #ddd;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+
+.sidebar-header {
+    padding: 21px;
+    text-align: left;
+    box-sizing: border-box;
+    border-bottom: 0px solid #ddd;
+    width: 100%;
+    background-color: #141401;
+}
+
+.sidebar-header h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #e2dce4;
+}
+
+.sidebar .nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 20px;
+    width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .nav-item {
+    margin: 0;
+    width: 100%; /* Ensure sidebar items take full width */
+    padding-left: 15px;
+}
+
+.sidebar .nav-link {
+    display: block; /* Ensure links stack vertically */
+    padding: 10px 15px; /* Adjust padding for spacing */
+    color: #333; /* Text color */
+    text-decoration: none; /* Remove underline */
+    border: none; /* Remove the border */
+    text-align: left; /* Align text to the left */
+}
+
+.sidebar .nav-link:hover {
+    background-color: #f0f0f0; /* Optional: Add hover effect */
+    color: #007bff; /* Optional: Change text color on hover */
+}
+
+ul.nav {
+    display: flex !important; /* Force flex display */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.nav-item {
+    flex: 0 0 auto; /* Ensure each tab takes only as much space as needed */
+    margin: 0 5px; /* Add spacing between tabs */
+    width: auto; /* Remove the full-width behavior */
+}
+
+.nav-link {
+    width: auto; /* Ensure the link does not stretch */
+    text-align: center; /* Center the text inside the button */
+    padding: 10px 15px; /* Adjust padding for better appearance */
+    display: inline-block; /* Ensure the buttons align horizontally */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+.nav-link i {
+    margin-right: 12px;
+    font-size: 1.2rem;
+}
+
+.nav-link:hover {
+    background-color: #e0e0e0;
+    color: #222;
+}
+
+.nav-link.active {
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+}
+
+.main-content {
+    flex: 1;
+    padding: 10px;
+    margin-left: 250px;
+    display: flex;
+    flex-direction: column;
+    background-color: #f0f5f2 !important;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+}
+
+/* Styles for the icons.  Using simple CSS for demonstration */
+.bi-house-door-fill::before { content: "\f015"; }
+.bi-pencil-square::before { content: "\f044"; }
+.bi-bar-chart-line::before { content: "\f080"; }
+
+/* Font Awesome 6 Free v6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc. */
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    font-style: normal;
+    font-weight: 400;
+    font-display: auto;
+    src: url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-regular-400.woff2) format("woff2"),
+            url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-regular-400.woff) format("woff"),
+            url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff) format("woff"),
+            url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.ttf) format("truetype");
+}
+.fa-regular {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 400;
+}
+@font-face {
+    font-family: 'Font Awesome 6 Free';
+    font-style: normal;
+    font-weight: 900;
+    font-display: auto;
+    src: url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff2) format("woff2"),
+            url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.woff) format("woff"),
+            url(https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/webfonts/fa-solid-900.ttf) format("truetype");
+}
+.fa-solid {
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+}
+
+/* Example icons from Font Awesome */
+.bi-house-door-fill::before {
+    content: "\f015";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+.bi-pencil-square::before {
+    content: "\f044";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+.bi-bar-chart-line::before {
+    content: "\f080";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+
+/* Ensure all cards have equal height */
+.card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    
+}
+
+
+.performance-section {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Align the sections centrally */
+}
+
+.performance-section .row {
+    gap: 0px; /* Remove space between columns */
+}
+.performance-section .col-md-3 {
+    display: flex;
+    justify-content: center;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Vertically align card content */
+    text-align: center; /* Horizontally center content */
+    padding: 10px 15px;
+    flex-grow: 1; /* Ensure the card body takes up remaining space */
+}
+
+.card-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.card-text {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+.p-3 {
+    border: none;
+    background-color: #fcfcfc;
+}
+
+.custom-card {
+    border-radius: 12px !important; /* or any value you like */
+}
+.badge-sm {
+    font-size: 1rem !important; /* Increase font size */
+    padding: 0.5em 0.5em !important; /* Adjust padding for height */
+    border-radius: 5px !important; /* Optional: Adjust border radius */
+    color: white !important; /* Text color */
+}
+.perform{
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+canvas {
+    height: 300px !important;
+ 
+}
+.chart-wrapper {
+    border-radius: 10px;
+    overflow: hidden; /* Needed to clip chart corners */
+    background: #fff;  /* Optional: background to show rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow */
+}
+.dt-button {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+/* Center-align table headers */
+table th {
+    text-align: center !important;  /* Center-align the text */ 
+    vertical-align: middle; /* Vertically align the text in the middle */
+}
+
+/* Update text color of workflow table */
+.text-bright-success {
+    color: #00e676; /* bright green */
+    font-weight: bold;
+}
+
+.text-bright-warning {
+    color: #ffca28; /* bright amber */
+    font-weight: bold;
+}
+
+.text-bright-danger {
+    color: #ff5252; /* bright red */
+    font-weight: bold;
+}
+
+.text-danger {
+    color: #ff0000; /* Bright red */
+    font-weight: 500;
+}
+
+.text-success {
+    color: #00ff00; /* Bright green */
+    font-weight: 500;
+}
+
+.text-warning {
+    color: #ffc107; /* Bright amber */
+    font-weight: 500;
+}
+
+/* Filter form css */
+#filter-form {
+    gap: 10px;
+}
+
+.filters h5 {
+    font-weight: 600;
+    margin-bottom: 15px;
+    
+}
+
+.filters .form-group {
+    margin-bottom: 15px;
+}
+
+/* Add space between the filter section and nav tabs */
+#filterContainer {
+    margin-bottom: 20px; /* Add space below the filter container */
+    padding: 10px; /* Reduce padding to make the height smaller */
+}
+
+/* Adjust the width of dropdowns */
+.custom-dropdown {
+    width: 100%; /* Ensure dropdowns take up the full width of their column */
+    max-width: 100%; /* Prevent overflow */
+    padding: 5px; /* Adjust padding for a cleaner look */
+    font-size: 0.9rem; /* Optional: Adjust font size */
+}
+
+/* Add spacing between filters */
+#worklist-filter-form .form-group {
+    margin-bottom: 10px;
+}
+
+/* Adjust the height of the filter bar */
+#filterContainer {
+    padding: 10px; /* Reduce padding to make the height smaller */
+    margin-bottom: 20px; /* Add space below the filter container */
+}
+
+#worklist-filter-form .btn {
+    margin-top: 10px; /* Add top margin to the buttons */
+}
+
+#worklist-filter-form .form-label {
+    text-align: left;
+    display: block;
+}
+
+.nav-tabs {
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto; /* Allow horizontal scrolling */
+    white-space: nowrap; /* Prevent text wrapping */
+    justify-content: flex-start; /* Align tabs to the left */
+    border-bottom: 1px solid #ddd; /* Optional: Add a border for better visibility */
+    padding: 0;
+    margin: 0;
+    height: auto; /* Ensure the height adjusts to content */
+    overflow-y: hidden; /* Prevent vertical scrolling */
+}
+
+.nav-tabs .nav-item {
+    flex: 0 0 auto; /* Ensure tabs take only as much space as needed */
+    margin-right: 5px; /* Add spacing between tabs */
+}
+
+.nav-tabs .nav-link {
+    display: inline-block; /* Ensure tabs align horizontally */
+    border: 1px solid transparent; /* Default border */
+    border-radius: 0; /* Remove rounded corners */
+    padding: 10px 15px; /* Adjust padding for better appearance */
+    color: #007bff; /* Default tab color */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-tabs .nav-link.active {
+    background-color: #007bff; /* Active tab background */
+    color: white; /* Active tab text color */
+    border-color: #007bff; /* Active tab border */
+}
+
+#workflowTabs {
+    display: flex;
+    justify-content: flex-start; /* Align tabs to the left */
+    overflow-x: auto; /* Allow horizontal scrolling if tabs overflow */
+    padding: 0; /* Remove extra padding */
+    margin: 0; /* Remove extra margin */
+    list-style: none; /* Remove default list styling */
+    width: 100%; /* Ensure the container spans the full width */
+    box-sizing: border-box; /* Include padding and border in width */
+}
+
+#workflowTabs .nav-tabs {
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    overflow-x: auto; /* Allow horizontal scrolling */
+    white-space: nowrap; /* Prevent text wrapping */
+    justify-content: flex-start; /* Align tabs to the left */
+    border-bottom: 0px solid #ddd; /* Optional: Add a border for better visibility */
+    padding: 0;
+    margin: 0;
+    height: auto; /* Ensure the height adjusts to content */
+    overflow-y: hidden; /* Prevent vertical scrolling */
+    
+}
+
+#workflowTabs .nav-item {
+    flex: 0 0 150px; /* Ensure tabs take only as much space as needed */
+    margin-right: 5px; /* Add spacing between tabs */
+    border: 1px solid lightgray; /* Default border */
+    text-align: center; /* Center text in tabs */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#workflowTabs .nav-link {
+    display: flex; /* Ensure tabs align horizontally */
+    border: 1px solid transparent; /* Default border */
+    border-radius: 0; /* Remove rounded corners */
+    padding: 10px 10px; /* Adjust padding for better appearance */
+    color: #ffffff; /* Default tab color */
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: center; /* Center text in tabs */
+    background-color: rgb(139, 135, 135); /* Default background color */
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+#workflowTabs .nav-link.active {
+    background-color: #007bff; /* Active tab background */
+    color: white; /* Active tab text color */
+    border-color: #007bff; /* Active tab border */
+}
+
+/* Target all tables in worklist.html */
+#workflowTabsContent .table {
+    background-color: #fffcfc; /* Set the table background color to white */
+    border-collapse: separate; /* Ensure borders are styled properly */
+    border-spacing: 0; /* Optional: Adjust spacing between cells */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+}
+
+/* Optional: Add padding and border styles for table cells */
+#workflowTabsContent .table th, 
+#workflowTabsContent .table td {
+    padding: 10px; /* Add padding to table cells */
+    border: 1px solid #ddd; /* Add a light border to cells */
+    text-align: center; /* Align text to the left */
+    vertical-align: middle; /* Vertically align the text in the middle */
+}
+#workflowTabsContent .table th {
+    background-color: #6a6c6d; /* Light gray background for headers */
+    font-weight: bold; /* Bold text for headers */
+    color: white;
+}
+.tab-pane {
+    border: 1px solid lightgray; /* Add a light gray border */
+    padding-left: 10px; /* Reduce left padding */
+    padding-right: 10px; /* Reduce right padding */
+    padding: 15px; /* Optional: Add padding inside the container */
+    border-radius: 0 0 5px 5px; /* Optional: Round the bottom corners */
+    background-color: #ffffff; /* Optional: Set a white background */
+}
+
+/* Add space between the filter container and nav tabs */
+.card.shadow-sm {
+    width: auto; /* Allow the width to adjust dynamically */
+    max-width: 100%; /* Ensure it doesn't exceed the page width */
+    margin: 0 auto 20px auto; /* Center the container and add space below */
+    padding: 15px; /* Optional: Add padding inside the container */
+    box-sizing: border-box; /* Include padding and border in the width */
+}
+
+.table-responsive {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    margin-left: 0; /* Remove left margin */
+    margin-right: 0; /* Remove right margin */
+}
+
+table.data-table th, table.data-table td {
+    white-space: nowrap; /* Prevent text wrapping */
+}
+
+.card-header {
+    display: flex; /* Use flexbox for alignment */
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    position: relative; /* Allow absolute positioning for the button */
+}
+
+.card-header h5 {
+    text-align: center;
+    margin: 0 auto;
+    font-size: 1.25rem; /* Adjust font size if needed */
+    flex-grow: 1; /* Ensure the heading takes up available space */
+}
+
+.card-header .btn-link {
+    position: absolute; /* Position the button absolutely */
+    right: 10px; /* Align the button to the right */
+    top: 50%; /* Vertically center the button */
+    transform: translateY(-50%); /* Adjust for vertical centering */
+}
+
+.container-fluid {
+    max-width: 100%; /* Ensure the container spans the full width */
+    padding-left: 5px; /* Adjust left padding */
+    padding-right: 5px; /* Adjust right padding */
+    margin-left: 0; /* Remove left margin */
+    margin-right: 0; /* Remove right margin */
+}
+
+.dt-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;  /* Reduced gap between buttons */
+    justify-content: flex-start;  /* Align to left instead of center */
+    padding: 10px 0;  /* Add some vertical padding */
+    margin-left: 10px;  /* Add left margin */
+}
+
+.dt-buttons .btn {
+    margin: 0 !important;  /* Remove margins */
+    font-size: 0.8rem;  /* Smaller font size */
+    padding: 4px 8px;  /* Reduced padding */
+    border-radius: 4px;  /* Slightly smaller border radius */
+    min-width: 60px;  /* Set minimum width */
+    max-width: 100px;  /* Set maximum width */
+}
+
+/* Remove any additional spacing from button groups */
+.dt-button-collection {
+    min-width: auto !important;
+}
+
+.dt-buttons .btn-group {
+    margin: 0 !important;
+}
+
+/* Ensure consistent sizing for all button types */
+.dt-buttons .btn-primary,
+.dt-buttons .btn-success,
+.dt-buttons .btn-info,
+.dt-buttons .btn-warning {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dt-buttons .btn:first-child {
+    border-top-left-radius: 5px !important;
+    border-bottom-left-radius: 5px !important;
+}
+
+.dt-buttons .btn:last-child {
+    border-top-right-radius: 5px !important;
+    border-bottom-right-radius: 5px !important;
+}
+
+#documentPreview {
+    position: relative;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    height: calc(100vh - 250px);
+}
+
+#documentPreview.loading::after {
+    content: 'Loading...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+}
+
+#docViewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.edit-row {
+    padding: 0.25rem;
+    width: 32px;
+    height: 32px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.edit-row i {
+    font-size: 14px;
+}
+
+
+
+/* Modal customization */
+.modal-fullscreen .modal-content {
+    min-height: 100vh;
+}
+
+.modal-fullscreen .modal-body {
+    padding: 1.5rem 0; /* Remove horizontal padding */
+}
+
+#deductionForm .form-group {
+    margin-bottom: 1rem;
+}
+
+#deductionForm .form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+#deductionForm .form-control {
+    font-size: 0.875rem;
+    padding: 0.375rem 0.75rem;
+}
+
+.document-section {
+    height: calc(100vh - 200px);
+    display: flex;
+    flex-direction: column;
+}
+
+.document-controls {
+    padding: 1rem;
+    background-color: #fff;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.document-controls .btn-group {
+    width: 100%;
+}
+
+.document-controls .btn {
+    flex: 1;
+}
+
+#documentPreview {
+    flex: 1;
+    min-height: 0;
+    background-color: #f8f9fa;
+}
+
+/* Make form scrollable if content is too long */
+#deductionForm {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* Cross-browser modal fixes */
+.modal {
+    -webkit-overflow-scrolling: touch;
+}
+
+.modal-open {
+    overflow: hidden;
+    padding-right: 0 !important;
+}
+
+/* Modal customization - with !important to override Bootstrap */
+.modal-fullscreen {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100vw !important;
+    max-width: none !important;
+    height: 100vh !important;
+}
+
+.modal-fullscreen .modal-dialog {
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.modal-fullscreen .modal-content {
+    min-height: 100vh !important;
+    height: 100% !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
+.modal-fullscreen .modal-body {
+    padding: 1rem !important;
+    height: calc(100vh - 120px) !important; /* Account for header and footer */
+    overflow-y: auto !important;
+}
+
+/* Form layout improvements */
+#deductionForm {
+    height: 100% !important;
+    overflow-y: auto !important;
+}
+
+.row.row-cols-1.row-cols-md-3 {
+    margin: 0 -0.5rem !important;
+}
+
+.row.row-cols-1.row-cols-md-3 > .col {
+    padding: 0 0.5rem !important;
+    margin-bottom: 1rem !important;
+}
+
+/* Document preview section */
+.document-section {
+    height: 100% !important;
+    border-left: 1px solid #dee2e6 !important;
+}
+
+#documentPreview {
+    height: calc(100% - 50px) !important; /* Account for document controls */
+}
+
+/* Reset modal styles */
+.modal-fullscreen {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-fullscreen .modal-dialog {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.modal-fullscreen .modal-content {
+    height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+}
+
+.modal-fullscreen .modal-header {
+    padding: 1rem !important;
+    background-color: #f8f9fa !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+.modal-fullscreen .modal-body {
+    display: flex !important;
+    height: calc(100vh - 116px) !important;
+    padding: 0 !important;
+}
+
+/* Form section styles */
+.modal-body .col-lg-7 {
+    padding: 1rem !important;
+    height: 100% !important;
+    overflow-y: auto !important;
+}
+
+#deductionForm {
+    height: 100% !important;
+}
+
+#deductionForm .row {
+    margin: 0 -0.5rem !important;
+}
+
+#deductionForm .col {
+    padding: 0.5rem !important;
+    flex: 0 0 33.333% !important;
+    max-width: 33.333% !important;
+}
+
+/* Document section styles */
+.modal-body .col-lg-5 {
+    padding: 1rem !important;
+    height: 100% !important;
+    border-left: 1px solid #dee2e6 !important;
+    background-color: #f8f9fa !important;
+}
+
+.document-section {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#documentPreview {
+    flex: 1 !important;
+    min-height: 0 !important;
+    margin-top: 1rem !important;
+}
+
+/* Footer styles */
+.modal-fullscreen .modal-footer {
+    padding: 1rem !important;
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+/* Modal fullscreen styles */
+.modal.fullscreen {
+    padding: 0 !important;
+}
+
+.modal.fullscreen .modal-dialog {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+.modal.fullscreen .modal-content {
+    height: auto !important;
+    min-height: 100% !important;
+    border-radius: 0 !important;
+    border: none !important;
+}
+
+.modal.fullscreen .modal-body {
+    display: flex !important;
+    height: calc(100vh - 130px) !important;
+    overflow: hidden !important;
+}
+
+.modal.fullscreen .modal-body .col-lg-7 {
+    height: 100% !important;
+    overflow-y: auto !important;
+}
+
+.modal.fullscreen .document-section {
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+#documentPreview {
+    flex: 1 !important;
+    min-height: 0 !important;
+    position: relative !important;
+}
+
+/* DataTable layout fixes */
+.dataTables_wrapper .row:first-child {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 20px;  /* Add gap between elements */
+}
+
+.dt-buttons {
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    gap: 3px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    align-items: center !important;
+    margin-left: 20px !important;  /* Add left margin */
+}
+
+.dataTables_length {
+    margin: 0 20px 0 10px !important;  /* Increase right margin */
+    display: inline-block !important;
+    min-width: 180px !important;  /* Set minimum width */
+}
+
+.dataTables_filter {
+    margin-left: auto !important;
+    margin-right: 20px !important;  /* Add right margin */
+    display: inline-block !important;
+    min-width: 200px !important;  /* Set minimum width */
+}
+
+/* Style the search input */
+.dataTables_filter input {
+    padding: 4px 8px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 4px !important;
+    width: 180px !important;  /* Set fixed width for search box */
+}
+
+.dt-buttons {
+    display: inline-flex !important;
+    flex-wrap: nowrap !important;
+    gap: 3px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    align-items: center !important;
+}
+
+.dt-buttons .btn {
+    padding: 2px 8px !important;
+    font-size: 0.75rem !important;
+    margin: 0 !important;
+    height: 24px !important;
+    line-height: 20px !important;
+    min-width: 45px !important;
+    max-width: 65px !important;
+}
+
+/* Remove extra spacing */
+.dataTables_wrapper .row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.dataTables_wrapper .col-sm-12 {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+}
+
+/* Table column width fixes */
+.data-table th,
+.data-table td {
+    white-space: nowrap;
+    padding: 8px !important;
+}
+
+/* .min-w-150 {
+    min-width: 150px !important;
+} */
+
+.data-table {
+    width: 100% !important;
+}
+
+.dataTables_scrollHead,
+.dataTables_scrollBody {
+    width: 100% !important;
+}
+
+/* Form field styling */
+.form-control[readonly] {
+    background-color: #f8f9fa !important;  /* Light gray background */
+    border-color: #dee2e6 !important;
+    color: #495057 !important;             /* Dark gray text */
+    cursor: default !important;
+}
+
+/* Style all form inputs consistently */
+.form-control-sm {
+    height: calc(1.5em + 0.5rem + 2px) !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    border-radius: 0.2rem !important;
+}

@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+{% block extrahead %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+{% endblock %}
+{% block content %}
+<script src="{% static 'js/worklist.js' %}"></script>
+<div class="container-fluid mt-4 px-1">
+   <!-- Filter Container -->
+   <div class="container-fluid mt-2 px-1">
+      <div class="card shadow-sm">
+         <!-- Filter Header with Collapsible Toggle -->
+         <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Filters</h5>
+            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#filterContainer" aria-expanded="true" aria-controls="filterContainer">
+            Show/Hide Filters
+            </button>
+         </div>
+         <div id="filterContainer" class="collapse show">
+            <div class="card-body">
+               <!-- Filter Form -->
+               <form id="worklist-filter-form" class="row g-3">
+                  <!-- Customer Filter -->
+                  <div class="col-md-2">
+                     <label for="customerFilter" class="form-label">Customer</label>
+                     <select id="customerFilter" class="form-control custom-dropdown">
+                        <option value="">All</option>
+                        {% for customer in unique_customers %}
+                        <option value="{{ customer }}">{{ customer }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+                  <!-- Status Filter - Used for tracking validation status -->
+                  <div class="col-md-2">
+                     <label for="statusFilter" class="form-label">Status</label>
+                     <select id="statusFilter" class="form-control custom-dropdown">
+                        <option value="">All</option>
+                        {% for status in unique_statuses %}
+                        <option value="{{ status }}">{{ status }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+                  <!-- Deduction Reason Filter -->
+                  <div class="col-md-2">
+                     <label for="reasonFilter" class="form-label">Deduction Reason</label>
+                     <select id="reasonFilter" class="form-control custom-dropdown">
+                        <option value="">All</option>
+                        {% for reason in unique_reasons %}
+                        <option value="{{ reason }}">{{ reason }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+                  <!-- Deduction Reason Filter -->
+                  <div class="col-md-2">
+                     <label for="validationFilter" class="form-label">Validation Status</label>
+                     <select id="validationFilter" class="form-control custom-dropdown">
+                        <option value="">All</option>
+                        {% for validation in unique_validation %}
+                        <option value="{{ validation }}">{{ validation }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+                  <!-- Date Range Filters -->
+                  <div class="col-md-2">
+                     <label for="deductionStartDate" class="form-label">Start Date</label>
+                     <input type="date" id="deductionStartDate" class="form-control custom-dropdown">
+                  </div>
+                  <div class="col-md-2">
+                     <label for="deductionEndDate" class="form-label">End Date</label>
+                     <input type="date" id="deductionEndDate" class="form-control custom-dropdown">
+                  </div>
+                  <!-- Amount Range Filter - For filtering by deduction amount -->
+                  <div class="col-md-2">
+                     <label for="deductionAmountRange" class="form-label">Deduction Amount</label>
+                     <select id="deductionAmountRange" class="form-control custom-dropdown">
+                        <option value="">All</option>
+                        <option value="0-500">0-500</option>
+                        <option value="501-1000">501-1000</option>
+                        <option value="1001-5000">1001-5000</option>
+                        <option value="5001-10000">5001-10000</option>
+                        <option value="10000+">10000+</option>
+                     </select>
+                  </div>
+                  <!-- Filter Action Buttons -->
+                  <div class="col-12">
+                     <button type="button" id="applyWorklistFilters" class="btn btn-primary">Apply Filters</button>
+                     <button type="reset" id="resetWorklistFilters" class="btn btn-secondary">Reset</button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+   </div>
+   <!-- Tab headers -->
+   <ul class="nav nav-tabs" id="workflowTabs" role="tablist">
+      {% for tab in tab_data %}
+      <li class="nav-item" role="presentation">
+         <a class="nav-link {% if forloop.first %}active{% endif %}"
+            id="{{ tab.label|slugify }}-tab"
+            data-toggle="tab"
+            href="#{{ tab.label|slugify }}"
+            role="tab"
+            aria-controls="{{ tab.label|slugify }}"
+            aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+         {{ tab.label }}
+         </a>
+      </li>
+      {% endfor %}
+   </ul>
+   <!-- Tab content -->
+   <div class="tab-content mt-3" id="workflowTabsContent">
+      {% for tab in tab_data %}
+      <div class="tab-pane fade {% if forloop.first %}show active{% endif %}"
+         id="{{ tab.label|slugify }}" role="tabpanel">
+         <div class="table-responsive">
+            <table id="table-{{ forloop.counter }}" class="table table-bordered table-hover data-table" width="100%">
+               <thead>
+                  <tr>
+                     {% for field in workflow_fields %}
+                     {% if field.name not in hidden_fields %}
+                     <th>{{ field.verbose_name|default:field.name }}</th>
+                     {% endif %}
+                     {% endfor %}
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for item in tab.data %}
+                  <tr>
+                     {% for field in workflow_fields %}
+                     {% if field.name not in hidden_fields %}
+                     {% if field.name == 'invoice_number' %}
+                     <td data-field="{{ field.name }}">
+                        <a href="#" 
+                           class="edit-deduction" 
+                           data-invoice="{{ item|getattr:field.name|floatformat:0 }}"
+                           data-toggle="modal" 
+                           data-target="#deductionDetailModal">
+                        {{ item|getattr:field.name|floatformat:0 }}
+                        </a>
+                     </td>
+                     {% elif field.name == 'deduction_date' %}
+                     <td data-field="{{ field.name }}">
+                        {{ item.deduction_date|date:"m/d/y" }}
+                     </td>
+                     {% elif field.name == 'validation_status' %}
+                     <td data-field="{{ field.name }}">
+                        <span class="{% if item|getattr:field.name == 'Valid' %}text-success{% elif item|getattr:field.name == 'Invalid' %}text-danger{% elif item|getattr:field.name == 'Pending Validation' %}text-warning{% endif %}">
+                        {{ item|getattr:field.name }}
+                        </span>
+                     </td>
+                     {% elif field.name == 'billback_package' %}
+                     <td data-field="{{ field.name }}">
+                        {% if item.validation_status == 'Invalid' %}
+                        <a href="{% url 'worklist' %}?download_docs=true&invoice_number={{ item|getattr:'invoice_number'|floatformat:0 }}" 
+                           class="btn btn-sm btn-secondary"
+                           title="Download Documents">
+                        <i class="fas fa-download"></i> Download Package
+                        </a>
+                        {% else %}
+                        {{ item|getattr:field.name }}
+                        {% endif %}
+                     </td>
+                     {% else %}
+                     <td data-field="{{ field.name }}">
+                        {{ item|getattr:field.name }}
+                     </td>
+                     {% endif %}
+                     {% endif %}
+                     {% endfor %}
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+      </div>
+      {% endfor %}
+   </div>
+   <!-- Deduction Detail Modal -->
+   <div class="modal fade fullscreen" id="deductionDetailModal" tabindex="-1" role="dialog" aria-labelledby="deductionDetailModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="deductionDetailModalLabel">
+                  Edit Deduction - Invoice #<span id="invoice_number_display"></span>
+               </h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+               <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <!-- Left side - Form -->
+               <div class="col-lg-7">
+                  <form id="deductionForm">
+                     <div class="row">
+                        <!-- Add visible invoice number field -->
+                        <div class="col">
+                           <div class="form-group">
+                              <label for="invoice_number" class="form-label">Invoice Number</label>
+                              <input type="text" 
+                              class="form-control form-control-sm" 
+                              id="invoice_number" 
+                              name="invoice_number"
+                              {% if field.name in readonly_fields %}readonly{% endif %}>
+                           </div>
+                        </div>
+                        {% for field in workflow_fields %}
+                        {% if field.name not in hidden_fields and field.name != 'invoice_number' %}
+                        <div class="col">
+                           <div class="form-group">
+                              <label for="{{ field.name }}" class="form-label">
+                              {{ field.verbose_name|default:field.name }}
+                              </label>
+                              {% if field.name == 'deduction_date' or field.name == 'date_worked' or field.name == 'billback_date' %}
+                              <input type="text" 
+                              class="form-control form-control-sm datepicker" 
+                              id="{{ field.name }}" 
+                              name="{{ field.name }}"
+                              data-date-format="mm/dd/yy"
+                              {% if field.name in readonly_fields %}readonly{% endif %}>
+                              <input type="hidden" 
+                                 name="{{ field.name }}_formatted" 
+                                 id="{{ field.name }}_formatted">
+                              {% else %}
+                              <input type="text" 
+                              class="form-control form-control-sm" 
+                              id="{{ field.name }}" 
+                              name="{{ field.name }}"
+                              {% if field.name in readonly_fields %}readonly{% endif %}>
+                              {% endif %}
+                           </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                     </div>
+                  </form>
+               </div>
+               <!-- Right side - Document Preview -->
+               <div class="col-lg-5">
+                  <div class="document-section">
+                     <div class="document-controls">
+                        <div class="btn-group">
+                           <button type="button" class="btn btn-outline-primary" data-doc-type="invoice">Invoice</button>
+                           <button type="button" class="btn btn-outline-primary" data-doc-type="pod">POD</button>
+                           <button type="button" class="btn btn-outline-primary" data-doc-type="backup">Backup</button>
+                        </div>
+                     </div>
+                     <div id="documentPreview">
+                        <iframe id="docViewer" width="100%" height="100%" frameborder="0"></iframe>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+               <button type="button" class="btn btn-primary" id="saveDeductionChanges">Save changes</button>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+{% endblock %}

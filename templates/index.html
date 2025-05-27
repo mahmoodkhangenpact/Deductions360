@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="container-fluid mt-4" >
+   <div class="row">
+      <!-- Main Content -->
+      <div class="col-12 col-lg-10">
+         <!-- Reduced width to 8 -->
+         <!-- Performance Cards -->
+         <div class="row g-4">
+            <!-- My Performance Section -->
+            <div class="col-12 col-lg-6">
+               <div class="p-3 shadow-sm" style="border-radius: 10px;">
+                  <h4 class="text-center mb-3 perform">My Performance</h4>
+                  <div class="row g-3">
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Deductions</h5>
+                              <p id="my-deductions" class="card-text">${{ deductions_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-success badge-sm">+10%</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Valids</h5>
+                              <p id="my-valids" class="card-text">${{ valid_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-success badge-sm">+5%</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Invalids</h5>
+                              <p id="my-invalids" class="card-text">${{ invalid_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-danger badge-sm">-3%</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Recovery</h5>
+                              <p id="my-recovery" class="card-text">${{ recovered_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-warning text-dark badge-sm">+2%</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <!-- Team's Performance Section -->
+            <div class="col-12 col-lg-6">
+               <div class="p-3 shadow-sm" style="border-radius: 10px;">
+                  <h4 class="text-center mb-3 perform">Team's Performance</h4>
+                  <div class="row g-3">
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Deductions</h5>
+                              <p id="team-deductions" class="card-text">${{ deductions_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-success badge-sm">+8%</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Valids</h5>
+                              <p id="team-valids" class="card-text">${{ valid_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-success badge-sm">+4%</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Invalids</h5>
+                              <p id="team-invalids" class="card-text">${{ invalid_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-danger badge-sm">-2%</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div class="col-12 col-sm-6 col-md-6 mb-4">
+                        <div class="card h-100 custom-card">
+                           <div class="card-body">
+                              <h5 class="card-title">Recovery</h5>
+                              <p id="team-recovery" class="card-text">${{ recovered_sum|floatformat:0|intcomma }}</p>
+                              <span class="badge bg-warning text-dark badge-sm">+1%</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <!-- Graphs Row -->
+         <div class="row mt-4">
+            <!-- Line Chart (70%) -->
+            <div class="col-12 col-lg-8 mb-4">
+               <div class="card h-100 shadow-sm" style="border-radius:10px; border:none; overflow: hidden;">
+                  <div class="card-body">
+                     <h5 class="card-title">Daily Transactions Worked</h5>
+                     <canvas id="dailyTransactionsChart" style="height: 300px;"></canvas>
+                  </div>
+               </div>
+            </div>
+            <!-- Donut Chart (30%) -->
+            <div class="col-12 col-lg-4 mb-4">
+               <div class="card h-100 shadow-sm" style="border-radius: 10px; overflow: hidden;">
+                  <div class="card-body">
+                     <h5 class="card-title">Top 10 Customers</h5>
+                     <canvas id="topCustomersDonutChart" style="height: 300px;"></canvas>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- Right Sidebar (Filters) -->
+      <div class="col-12 col-lg-2" style="padding-bottom: 20px; padding-Top: 0px;">
+         <div class="card shadow-sm text-center" style="border-radius: 10px;">
+            <div class="filters mt-3 px-2">
+               <h5 class="text-center">Filter Data</h5>
+               <form id="filter-form" class="d-flex flex-column align-items-center">
+                  <div class="form-group w-100 text-left">
+                     <label for="standard_customer">Standard Customer</label>
+                     <select class="form-control" id="standard_customer">
+                        <option value="">All</option>
+                        {% for customer in standard_customers %}
+                        <option value="{{ customer.standard_customer }}">{{ customer.standard_customer }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+                  <div class="form-group w-100 text-left">
+                     <label for="deducted_amount">Deducted Amount</label>
+                     <select class="form-control" id="deducted_amount">
+                        <option value="">All</option>
+                        {% for amount in deducted_amounts %}
+                        <option value="{{ amount.deducted_amount }}">{{ amount.deducted_amount }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+                  <div class="form-group w-100 text-left">
+                     <label for="deduction_date">Deduction Date</label>
+                     <input type="date" class="form-control" id="deduction_date_from" placeholder="From">
+                     <input type="date" class="form-control mt-2" id="deduction_date_to" placeholder="To">
+                  </div>
+                  <div class="form-group w-100 text-left">
+                     <label for="validation_status">Validation Status</label>
+                     <select class="form-control" id="validation_status">
+                        <option value="">All</option>
+                        {% for status in validation_statuses %}
+                        <option value="{{ status.validation_status }}">{{ status.validation_status }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+                  <div class="col-12">
+                     <button type="button" id='filter-button' class="btn btn-primary">Apply Filters</button>
+                     <button type="reset" id="resetFilters" class="btn btn-secondary">Reset</button>
+                  </div>
+               </form>
+            </div>
+         </div>
+      </div>
+      <!-- End Right Sidebar -->
+   </div>
+   <!-- End row -->
+   <!-- Table -->
+   <div class="mt-5">
+      <div class="card shadow-sm">
+         <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-table mr-2"></i> Deductions Data</h5>
+         </div>
+         <div class="card-body">
+            <div class="table-responsive">
+               <table id="dashboard-table" class="table table-striped table-hover table-bordered dt-responsive nowrap" style="width:100%">
+                  <thead class="thead-light">
+                     <tr>
+                        <th>Invoice</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     {% for record in records %}
+                     <tr>
+                        <td>{{ record.invoice_number|stringformat:"s" }}</td>
+                        <td>{{ record.standard_customer }}</td>
+                        <td>${{ record.deducted_amount }}</td>
+                        <td class="
+                           {% if record.validation_status == 'Valid' %}
+                           text-success
+                           {% elif record.validation_status == 'Pending Validation' %}
+                           text-warning
+                           {% elif record.validation_status == 'Invalid' %}
+                           text-danger
+                           {% endif %}
+                           ">
+                           {{ record.validation_status }}
+                        </td>
+                        <td>{{ record.deduction_date }}</td>
+                     </tr>
+                     {% endfor %}
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- End container -->
+<script>
+   document.addEventListener("DOMContentLoaded", function () {
+       let donutChart, dailyTransactionsChart;
+   
+       // Initialize Donut Chart
+       try {
+           const rawDonutChartData = JSON.parse('{{ donut_chart_data|escapejs }}');
+           const ctxDonut = document.getElementById('topCustomersDonutChart').getContext('2d');
+           donutChart = new Chart(ctxDonut, {
+               type: 'doughnut',
+               data: {
+                   labels: rawDonutChartData.labels,
+                   datasets: [{
+                       label: 'Customer $',
+                       data: rawDonutChartData.data,
+                       backgroundColor: [
+                           '#0d6efd', '#6f42c1', '#d63384', '#dc3545', '#fd7e14',
+                           '#ffc107', '#198754', '#20c997', '#0dcaf0', '#6c757d'
+                       ]
+                   }]
+               },
+               options: {
+                   responsive: true,
+                   maintainAspectRatio: false,
+                   plugins: {
+                       legend: { position: 'bottom' }
+                   }
+               }
+           });
+       } catch (error) {
+           console.error("Error parsing donut_chart_data JSON:", error);
+       }
+   
+       // Initialize Daily Transactions Chart
+       const ctxDaily = document.getElementById('dailyTransactionsChart').getContext('2d');
+       const labels = {{ dates|safe }}; // Dates worked (e.g., ["01/01/24", "01/02/24", ...])
+       const data = {{ transactions|safe }}; // Transactions worked per day (e.g., [20, 30, 25, ...])
+       dailyTransactionsChart = new Chart(ctxDaily, {
+           type: 'line',
+           data: {
+               labels: labels,
+               datasets: [
+                   {
+                       label: 'Transactions Worked',
+                       data: data,
+                       borderColor: '#007bff',
+                       backgroundColor: 'rgba(0, 123, 255, 0.2)',
+                       fill: true,
+                       tension: 0.4,
+                   },
+                   {
+                       label: 'Target (25)',
+                       data: Array(labels.length).fill(25), // Target line
+                       borderColor: '#ff0000',
+                       borderDash: [5, 5],
+                       pointRadius: 0,
+                       fill: false,
+                   },
+               ],
+           },
+           options: {
+               responsive: true,
+               plugins: {
+                   legend: {
+                       position: 'top',
+                   },
+               },
+               scales: {
+                   x: {
+                       grid: {
+                           display: false, // Remove gridlines for the x-axis
+                       },
+                   },
+                   y: {
+                       grid: {
+                           display: false, // Remove gridlines for the y-axis
+                       },
+                       beginAtZero: true,
+                   },
+               },
+           },
+       });
+   
+       // Apply filters to update the charts and cards dynamically
+       document.getElementById('filter-button').addEventListener('click', function () {
+           const customer = document.getElementById('standard_customer').value;
+           const status = document.getElementById('validation_status').value;
+           const fromDate = document.getElementById('deduction_date_from').value;
+           const toDate = document.getElementById('deduction_date_to').value;
+   
+           const params = new URLSearchParams({
+               standard_customer: customer,
+               validation_status: status,
+               deduction_date_from: fromDate,
+               deduction_date_to: toDate
+           });
+   
+           fetch(`/filtered-chart-data/?${params}`)
+               .then(response => response.json())
+               .then(data => {
+                   // Update Donut Chart
+                   donutChart.data.labels = data.donut_chart_data.labels;
+                   donutChart.data.datasets[0].data = data.donut_chart_data.data;
+                   donutChart.update();
+   
+                   // Update Daily Transactions Chart
+                   dailyTransactionsChart.data.labels = data.daily_transactions.dates;
+                   dailyTransactionsChart.data.datasets[0].data = data.daily_transactions.transactions;
+                   dailyTransactionsChart.update();
+   
+                   // Update Cards
+                   function formatCurrency(value) {
+                       return '$' + Number(value).toLocaleString('en-US', {
+                           minimumFractionDigits: 0,
+                           maximumFractionDigits: 0
+                       });
+                   }
+                   document.getElementById('my-deductions').textContent = formatCurrency(data.card_data.deductions);
+                   document.getElementById('my-valids').textContent = formatCurrency(data.card_data.valids);
+                   document.getElementById('my-invalids').textContent = formatCurrency(data.card_data.invalids);
+                   document.getElementById('my-recovery').textContent = formatCurrency(data.card_data.recovered);
+               })
+               .catch(error => console.error('Error fetching chart data:', error));
+       });
+   });
+</script>
+{% endblock %}
