@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-12">
+            <!-- Filter Section -->         
+            <div class="row mb-3">
+                <div class="col-12">               
+                    <div class="card shadow-sm" style="border-radius: 10px;">                       
+                         <div class="filters p-1">
+                            <form id="filter-form" class="row g-0 m-0">                                
+                                <div class="col pe-1" style="min-width: 150px;">
+                                    <label class="form-label small mb-0">Customer</label>
+                                    <select class="form-select" id="standard_customer" name="standard_customer">
+                                        <option value="">All</option>
+                                        {% for customer in standard_customers %}
+                                        <option value="{{ customer }}" {% if customer == selected_customer %}selected{% endif %}>{{ customer }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>                                <div class="col pe-1" style="min-width: 150px;">
+                                    <label class="form-label small mb-0">Status</label>
+                                    <select class="form-select" id="validation_status" name="validation_status">
+                                        <option value="">All</option>
+                                        {% for status in statuses %}
+                                        <option value="{{ status }}" {% if status == selected_status %}selected{% endif %}>{{ status }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>                               
+                                <div class="col pe-1" style="min-width: 150px;">
+                                    <label class="form-label small mb-0">Deduction Reason</label>
+                                    <select class="form-select" id="deduction_reason" name="deduction_reason">
+                                        <option value="">All</option>
+                                        {% for reason in reasons %}
+                                        <option value="{{ reason }}" {% if reason == selected_reason %}selected{% endif %}>{{ reason }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
+                                <div class="col pe-1" style="min-width: 150px;">
+                                    <label class="form-label small mb-0">Date Range</label>
+                                    <select class="form-select" id="date_range" name="date_range">
+                                        <option value="all" {% if not selected_date_range or selected_date_range == 'all' %}selected{% endif %}>All Time</option>
+                                        <option value="30" {% if selected_date_range == '30' %}selected{% endif %}>Last 30 Days</option>
+                                        <option value="60" {% if selected_date_range == '60' %}selected{% endif %}>Last 60 Days</option>
+                                        <option value="90" {% if selected_date_range == '90' %}selected{% endif %}>Last 90 Days</option>
+                                        <option value="180" {% if selected_date_range == '180' %}selected{% endif %}>Last 180 Days</option>
+                                        <option value="365" {% if selected_date_range == '365' %}selected{% endif %}>Last Year</option>
+                                        <option value="custom" {% if selected_date_range == 'custom' %}selected{% endif %}>Custom Range</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-auto ps-1">
+                                    <button type="submit" class="btn btn-primary btn-sm py-0 px-2" style="height: 28px; font-size: 1rem;">Apply</button>
+                                    <button type="reset" id="resetInsightsFilters" class="btn btn-secondary btn-sm py-0 px-2" style="height: 28px; font-size: 1rem;">Reset</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .performance-row {
+                    display: flex;
+                    flex-wrap: nowrap;
+                    margin: 0 -0.25rem;
+                }
+                .performance-col {
+                    flex: 0 0 12.5%;
+                    padding: 0 0.25rem;
+                }
+                @media (max-width: 767px) {
+                    .performance-row {
+                        flex-wrap: wrap;
+                    }
+                    .performance-col {
+                        flex: 0 0 50%;
+                    }
+                }
+                .card-body {
+                    padding: 0.5rem;
+                }
+                .card h5 {
+                    font-size: 0.85rem;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .card h3 {
+                    font-size: 1.25rem;
+                    margin-bottom: 0;
+                }
+                
+                /* Custom style for the row containing reeason level charts */
+                .top-reasons-row {
+                    background-color: white;
+                    padding: 10px;
+                    border-radius: 10px;
+                    margin: 0;
+                    width: 100%; /* Full width without viewport adjustments */
+                    box-sizing: border-box; /* Include padding and border in width */
+                }
+
+                /* Custom style for the row containing Top 10 Customers charts */
+                .top-customers-row {
+                    background-color: white;
+                    padding: 10px;
+                    border-radius: 10px;
+                    margin: 0;
+                    width: 100%; /* Full width without viewport adjustments */
+                    box-sizing: border-box; /* Include padding and border in width */
+                }
+
+                /* Update style for the title to ensure it does not overlap the sidebar */
+                .top-customers-title {
+                    background-color: white;
+                    padding: 10px 0;
+                    border-radius: 0;
+                    font-weight: bold;
+                    text-align: center;
+                    margin: 0;
+                    width: 100%; /* Full width without viewport adjustments */
+                    box-sizing: border-box; /* Include padding and border in width */
+                }
+            </style>
+
+            <!-- Performance Cards -->
+            <div class="performance-row">
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">                            
+                            <h5 class="card-title text-muted mb-2"><i class="fas fa-dollar-sign me-1"></i> Total Revenue</h5>
+                            <h3 class="card-text text-primary" id="total_revenue">${{ total_revenue|floatformat:0|intcomma }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-muted mb-2"><i class="fas fa-dollar-sign me-1"></i> YTD Deductions</h5>
+                            <h3 class="card-text text-primary" id="ytd_deductions">${{ ytd_deductions|floatformat:0|intcomma }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-muted mb-2"><i class="fas fa-percent me-1"></i> Ded as % of Rev</h5>
+                            <h3 class="card-text text-warning" id="deductions_percentage">{{ deductions_percentage|floatformat:2 }}%</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-muted mb-2"><i class="fas fa-file-invoice-dollar me-1"></i> Total Deductions</h5>
+                            <h3 class="card-text text-success" id="total_deductions">${{ total_deductions|floatformat:0|intcomma }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-muted mb-2"><i class="fas fa-check-circle me-1"></i> Valid Deductions</h5>
+                            <h3 class="card-text text-info" id="valid_deductions">${{ valid_deductions|floatformat:0|intcomma }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">                              <h5 class="card-title text-muted mb-2"><i class="fas fa-balance-scale me-1"></i> Under Tolerance</h5>
+                            <h3 class="card-text text-warning" id="under_tolerance">${{ under_tolerance|default:0|floatformat:0|intcomma }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-muted mb-2"><i class="fas fa-times-circle me-1"></i> Invalid Deductions</h5>
+                            <h3 class="card-text text-danger" id="invalid_deductions">${{ invalid_deductions|floatformat:0|intcomma }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="performance-col mb-3">
+                    <div class="card shadow-sm bg-white border-0 h-100" style="border-radius: 10px;">
+                        <div class="card-body text-center">
+                            <h5 class="card-title text-muted mb-2"><i class="fas fa-clock me-2"></i> Pending Deductions</h5>
+                            <h3 class="card-text text-warning" id="pending_deductions">${{ pending_deductions|floatformat:0|intcomma }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>            <!-- Charts Section -->
+            <div class="row">
+                <!-- Quarterly Deductions Chart -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-chart-line me-2"></i>Quarterly Deductions Trend</h5>
+                            <canvas id="quarterlyTrendChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Status Distribution Chart -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-chart-pie me-2"></i>Q-O-Q Open/Closed Deductions</h5>
+                            <canvas id="openclosedChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Title for Top Reasons -->
+            <h4 class="top-customers-title">Top Reasons (By Deduction)</h4>
+            <!-- Horizontal Bar Charts Row -->
+            <div class="row top-reasons-row">
+                <!-- Deduction Breakdown by Reason Code -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-bars me-2"></i>Deduction Breakdown ($)</h5>
+                            <canvas id="deductionBreakdownChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Deduction as % of Revenue by Reason Code -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-percentage me-2"></i>Deduction % of Revenue</h5>
+                            <canvas id="deductionPercentageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Invalids as % of Deductions by Reason Code -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-times-circle me-2"></i>Invalids % of Deductions</h5>
+                            <canvas id="invalidPercentageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recovery as % of Invalids by Reason Code -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-redo me-2"></i>Recovery % of Invalids</h5>
+                            <canvas id="recoveryPercentageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </br>
+            <!-- New Charts Row -->
+            <div class="row">
+                <!-- Tolerance Distribution -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-balance-scale me-2"></i>Tolerance Distribution by Range</h5>
+                            <canvas id="toleranceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Deduction Reasons -->
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-pie-chart me-2"></i>Deduction Reasons</h5>
+                            <canvas id="reasonsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Title for Top 10 Customers Charts -->
+            <h4 class="top-customers-title">Top 10 Customers (By Deduction)</h4>
+            <!-- Horizontal Bar Charts Row for Top 10 Customers -->
+            <div class="row top-customers-row">
+                <!-- Deduction Breakdown by Customer -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-bars me-2"></i>Deduction Breakdown ($)</h5>
+                            <canvas id="topCustomersBreakdownChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Deduction as % of Revenue by Customer -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-percentage me-2"></i>Deduction % of Revenue</h5>
+                            <canvas id="topCustomersPercentageChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Invalids as % of Deductions by Customer -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-times-circle me-2"></i>Invalids % of Deductions</h5>
+                            <canvas id="topCustomersInvalidChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recovery as % of Invalids by Customer -->
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm bg-white border-0" style="border-radius: 10px;">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted mb-3"><i class="fas fa-redo me-2"></i>Recovery % of Invalids</h5>
+                            <canvas id="topCustomersRecoveryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>      </div>
+      <!-- End Main Content -->
+   </div>
+   <!-- End row -->
+   
+</div>
+<!-- End container -->
+<!-- Initialize global data and setup -->
+<script type="text/javascript">
+// Global data
+window.monthlyLabels = {{ monthly_labels|safe|default:"[]" }};
+window.monthlyData = {{ monthly_data|safe|default:"[]" }};
+window.quarters = {{ quarters|safe|default:"[]" }};
+window.openAmounts = {{ open_amounts|safe|default:"[]" }};
+window.closedAmounts = {{ closed_amounts|safe|default:"[]" }};
+window.toleranceData = {{ tolerance_data|safe|default:"{}" }};
+window.reasonChartData = {{ reason_chart_data|safe|default:"{}" }};
+window.customerChartData = {{ topcustomer_chart_data|safe|default:"{}" }};
+</script> 
+<!-- Load insights.js first -->
+<script src="{% static 'js/insights.js' %}"></script>
+{% endblock %}

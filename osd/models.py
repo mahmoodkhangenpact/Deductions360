@@ -73,3 +73,77 @@ class workflow(models.Model):
 
     def __str__(self):
         return f"Workflow #{self.id} - {self.status}"
+
+class Deductions(models.Model):
+    deduction_reference = models.CharField(max_length=255, unique=False)
+    standard_customer = models.CharField(max_length=255)
+    invoice_number = models.CharField(max_length=255)
+    deducted_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    deduction_date = models.DateField()
+    deduction_reason = models.TextField()
+    
+    STATUS_CHOICES = [
+        ('Pending Validation', 'Pending Validation'),
+        ('Validated', 'Validated'),
+        ('Billed Back', 'Billed Back'),
+        ('Recovered', 'Recovered'),
+    ]
+    
+    VALIDATION_STATUS_CHOICES = [
+        ('Valid', 'Valid'),
+        ('Invalid', 'Invalid'),
+        ('Pending', 'Pending'),
+    ]
+    
+    OPEN_CLOSED_CHOICES = [
+        ('Open', 'Open'),
+        ('Closed', 'Closed'),
+    ]
+    
+    TOLERANCE_CHOICES = [
+        ('UT', 'Under Tolerance'),
+        ('OT', 'Over Tolerance'),
+    ]
+    
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Pending Validation')
+    validation_status = models.CharField(max_length=20, choices=VALIDATION_STATUS_CHOICES, default='Pending')
+    open_closed = models.CharField(max_length=10, choices=OPEN_CLOSED_CHOICES, default='Open')
+    valid_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    invalid_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    recovered_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    date_worked = models.DateField(null=True, blank=True)
+    tolerance = models.CharField(max_length=2, choices=TOLERANCE_CHOICES, blank=True, null=True)
+    invoice = models.ForeignKey('Invoice', on_delete=models.CASCADE, null=True)  # Removed `to_field` to resolve the uniqueness constraint issue
+
+    class Meta:
+        verbose_name = 'Deduction'
+        verbose_name_plural = 'Deductions'
+        ordering = ['-deduction_date']
+
+    def __str__(self):
+        return f"{self.deduction_reference} - {self.standard_customer} - ${self.deducted_amount}"
+
+class Invoice(models.Model):
+    invoice_number = models.CharField(max_length=255)  # Removed unique=True to allow multiple rows with the same invoice_number
+    standard_customer = models.CharField(max_length=255, null=True, blank=True)  # Added standard_customer field
+    invoice_date = models.DateField()
+    order_number = models.CharField(max_length=100)
+    bol = models.CharField(max_length=100, verbose_name='Bill of Lading')
+    carrier = models.CharField(max_length=100)
+    sku = models.CharField(max_length=100)
+    billed_qty = models.IntegerField()
+    gross_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    net_amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        verbose_name = 'Invoice'
+        verbose_name_plural = 'Invoices'
+        ordering = ['-invoice_date', 'invoice_number', 'sku']
+        # Add index for faster lookups
+        indexes = [
+            models.Index(fields=['invoice_number', 'sku']),
+        ]
+
+    def __str__(self):
+        return f"Invoice {self.invoice_number} - {self.sku} - ${self.gross_amount}"
+

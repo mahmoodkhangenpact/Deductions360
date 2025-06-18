@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load static %}
 {% block content %}
 <div class="container-fluid mt-4" >
    <div class="row">
@@ -124,41 +125,50 @@
          <div class="card shadow-sm text-center" style="border-radius: 10px;">
             <div class="filters mt-3 px-2">
                <h5 class="text-center">Filter Data</h5>
-               <form id="filter-form" class="d-flex flex-column align-items-center">
+               <!-- Filter Form -->
+               <form id="filter-form" class="d-flex flex-column align-items-center">                  
                   <div class="form-group w-100 text-left">
                      <label for="standard_customer">Standard Customer</label>
-                     <select class="form-control" id="standard_customer">
+                     <select class="form-control" id="standard_customer" name="standard_customer">
                         <option value="">All</option>
                         {% for customer in standard_customers %}
-                        <option value="{{ customer.standard_customer }}">{{ customer.standard_customer }}</option>
+                        <option value="{{ customer.standard_customer }}" {% if customer.standard_customer == selected_customer %}selected{% endif %}>
+                            {{ customer.standard_customer }}
+                        </option>
                         {% endfor %}
                      </select>
                   </div>
                   <div class="form-group w-100 text-left">
-                     <label for="deducted_amount">Deducted Amount</label>
-                     <select class="form-control" id="deducted_amount">
-                        <option value="">All</option>
-                        {% for amount in deducted_amounts %}
-                        <option value="{{ amount.deducted_amount }}">{{ amount.deducted_amount }}</option>
-                        {% endfor %}
-                     </select>
+                     <label>Deducted Amount Range</label>
+                     <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                           <span class="input-group-text">$</span>
+                        </div>
+                        <input type="number" class="form-control" id="deducted_amount_min" name="deducted_amount_min" placeholder="Min" min="0">
+                     </div>
+                     <div class="input-group">
+                        <div class="input-group-prepend">
+                           <span class="input-group-text">$</span>
+                        </div>
+                        <input type="number" class="form-control" id="deducted_amount_max" name="deducted_amount_max" placeholder="Max" min="0">
+                     </div>
                   </div>
                   <div class="form-group w-100 text-left">
-                     <label for="deduction_date">Deduction Date</label>
-                     <input type="date" class="form-control" id="deduction_date_from" placeholder="From">
-                     <input type="date" class="form-control mt-2" id="deduction_date_to" placeholder="To">
+                     <label>Deduction Date Range</label>
+                     <input type="date" class="form-control" id="deduction_date_from" name="deduction_date_from" data-toggle="tooltip" title="From Date">
+                     <input type="date" class="form-control mt-2" id="deduction_date_to" name="deduction_date_to" data-toggle="tooltip" title="To Date">
                   </div>
                   <div class="form-group w-100 text-left">
                      <label for="validation_status">Validation Status</label>
-                     <select class="form-control" id="validation_status">
+                     <select class="form-control" id="validation_status" name="validation_status">
                         <option value="">All</option>
-                        {% for status in validation_statuses %}
-                        <option value="{{ status.validation_status }}">{{ status.validation_status }}</option>
-                        {% endfor %}
+                        <option value="Valid">Valid</option>
+                        <option value="Invalid">Invalid</option>
+                        <option value="Pending Validation">Pending Validation</option>
                      </select>
                   </div>
                   <div class="col-12">
-                     <button type="button" id='filter-button' class="btn btn-primary">Apply Filters</button>
+                     <button type="submit" id="filter-button" class="btn btn-primary">Apply Filters</button>
                      <button type="reset" id="resetFilters" class="btn btn-secondary">Reset</button>
                   </div>
                </form>
@@ -176,8 +186,8 @@
          </div>
          <div class="card-body">
             <div class="table-responsive">
-               <table id="dashboard-table" class="table table-striped table-hover table-bordered dt-responsive nowrap" style="width:100%">
-                  <thead class="thead-light">
+               <table id="dashboard-table" class="table table-bordered table-hover data-table" width="100%">
+                  <thead>
                      <tr>
                         <th>Invoice</th>
                         <th>Customer</th>
@@ -189,21 +199,23 @@
                   <tbody>
                      {% for record in records %}
                      <tr>
-                        <td>{{ record.invoice_number|stringformat:"s" }}</td>
-                        <td>{{ record.standard_customer }}</td>
-                        <td>${{ record.deducted_amount }}</td>
-                        <td class="
-                           {% if record.validation_status == 'Valid' %}
-                           text-success
-                           {% elif record.validation_status == 'Pending Validation' %}
-                           text-warning
-                           {% elif record.validation_status == 'Invalid' %}
-                           text-danger
-                           {% endif %}
-                           ">
-                           {{ record.validation_status }}
+                        <td data-field="invoice_number">
+                           <a href="#" 
+                              class="edit-deduction" 
+                              data-invoice="{{ record.invoice_number|stringformat:"s" }}"
+                              data-toggle="modal" 
+                              data-target="#deductionDetailModal">
+                           {{ record.invoice_number|stringformat:"s" }}
+                           </a>
                         </td>
-                        <td>{{ record.deduction_date }}</td>
+                        <td data-field="customer">{{ record.customer }}</td>
+                        <td data-field="amount">${{ record.amount|floatformat:2 }}</td>
+                        <td data-field="status">
+                           <span class="{% if record.status == 'Valid' %}text-success{% elif record.status == 'Invalid' %}text-danger{% elif record.status == 'Pending Validation' %}text-warning{% endif %}">
+                           {{ record.status }}
+                           </span>
+                        </td>
+                        <td data-field="date">{{ record.date|date:"m/d/y" }}</td>
                      </tr>
                      {% endfor %}
                   </tbody>
@@ -214,130 +226,6 @@
    </div>
 </div>
 <!-- End container -->
-<script>
-   document.addEventListener("DOMContentLoaded", function () {
-       let donutChart, dailyTransactionsChart;
-   
-       // Initialize Donut Chart
-       try {
-           const rawDonutChartData = JSON.parse('{{ donut_chart_data|escapejs }}');
-           const ctxDonut = document.getElementById('topCustomersDonutChart').getContext('2d');
-           donutChart = new Chart(ctxDonut, {
-               type: 'doughnut',
-               data: {
-                   labels: rawDonutChartData.labels,
-                   datasets: [{
-                       label: 'Customer $',
-                       data: rawDonutChartData.data,
-                       backgroundColor: [
-                           '#0d6efd', '#6f42c1', '#d63384', '#dc3545', '#fd7e14',
-                           '#ffc107', '#198754', '#20c997', '#0dcaf0', '#6c757d'
-                       ]
-                   }]
-               },
-               options: {
-                   responsive: true,
-                   maintainAspectRatio: false,
-                   plugins: {
-                       legend: { position: 'bottom' }
-                   }
-               }
-           });
-       } catch (error) {
-           console.error("Error parsing donut_chart_data JSON:", error);
-       }
-   
-       // Initialize Daily Transactions Chart
-       const ctxDaily = document.getElementById('dailyTransactionsChart').getContext('2d');
-       const labels = {{ dates|safe }}; // Dates worked (e.g., ["01/01/24", "01/02/24", ...])
-       const data = {{ transactions|safe }}; // Transactions worked per day (e.g., [20, 30, 25, ...])
-       dailyTransactionsChart = new Chart(ctxDaily, {
-           type: 'line',
-           data: {
-               labels: labels,
-               datasets: [
-                   {
-                       label: 'Transactions Worked',
-                       data: data,
-                       borderColor: '#007bff',
-                       backgroundColor: 'rgba(0, 123, 255, 0.2)',
-                       fill: true,
-                       tension: 0.4,
-                   },
-                   {
-                       label: 'Target (25)',
-                       data: Array(labels.length).fill(25), // Target line
-                       borderColor: '#ff0000',
-                       borderDash: [5, 5],
-                       pointRadius: 0,
-                       fill: false,
-                   },
-               ],
-           },
-           options: {
-               responsive: true,
-               plugins: {
-                   legend: {
-                       position: 'top',
-                   },
-               },
-               scales: {
-                   x: {
-                       grid: {
-                           display: false, // Remove gridlines for the x-axis
-                       },
-                   },
-                   y: {
-                       grid: {
-                           display: false, // Remove gridlines for the y-axis
-                       },
-                       beginAtZero: true,
-                   },
-               },
-           },
-       });
-   
-       // Apply filters to update the charts and cards dynamically
-       document.getElementById('filter-button').addEventListener('click', function () {
-           const customer = document.getElementById('standard_customer').value;
-           const status = document.getElementById('validation_status').value;
-           const fromDate = document.getElementById('deduction_date_from').value;
-           const toDate = document.getElementById('deduction_date_to').value;
-   
-           const params = new URLSearchParams({
-               standard_customer: customer,
-               validation_status: status,
-               deduction_date_from: fromDate,
-               deduction_date_to: toDate
-           });
-   
-           fetch(`/filtered-chart-data/?${params}`)
-               .then(response => response.json())
-               .then(data => {
-                   // Update Donut Chart
-                   donutChart.data.labels = data.donut_chart_data.labels;
-                   donutChart.data.datasets[0].data = data.donut_chart_data.data;
-                   donutChart.update();
-   
-                   // Update Daily Transactions Chart
-                   dailyTransactionsChart.data.labels = data.daily_transactions.dates;
-                   dailyTransactionsChart.data.datasets[0].data = data.daily_transactions.transactions;
-                   dailyTransactionsChart.update();
-   
-                   // Update Cards
-                   function formatCurrency(value) {
-                       return '$' + Number(value).toLocaleString('en-US', {
-                           minimumFractionDigits: 0,
-                           maximumFractionDigits: 0
-                       });
-                   }
-                   document.getElementById('my-deductions').textContent = formatCurrency(data.card_data.deductions);
-                   document.getElementById('my-valids').textContent = formatCurrency(data.card_data.valids);
-                   document.getElementById('my-invalids').textContent = formatCurrency(data.card_data.invalids);
-                   document.getElementById('my-recovery').textContent = formatCurrency(data.card_data.recovered);
-               })
-               .catch(error => console.error('Error fetching chart data:', error));
-       });
-   });
-</script>
+<!-- Load charts.js first -->
+<script src="{% static 'js/charts.js' %}"></script>
 {% endblock %}

@@ -304,14 +304,19 @@ ul.nav {
 
 canvas {
     height: 300px !important;
- 
+    width: 100% !important;
 }
+
 .chart-wrapper {
+    position: relative;
+    height: 300px; /* Ensure parent has height */
+    padding: 10px;
+    background: #fff;
     border-radius: 10px;
-    overflow: hidden; /* Needed to clip chart corners */
-    background: #fff;  /* Optional: background to show rounded corners */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow */
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 .dt-button {
     display: inline-block;
     margin-right: 5px;
@@ -357,16 +362,22 @@ table th {
 /* Filter form css */
 #filter-form {
     gap: 10px;
+    align-items: flex-start !important;
 }
 
 .filters h5 {
     font-weight: 600;
     margin-bottom: 15px;
-    
 }
 
 .filters .form-group {
     margin-bottom: 15px;
+}
+
+.filters .col {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-bottom: 10px !important;
 }
 
 /* Add space between the filter section and nav tabs */
@@ -495,6 +506,8 @@ table th {
     border-collapse: separate; /* Ensure borders are styled properly */
     border-spacing: 0; /* Optional: Adjust spacing between cells */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: Add a subtle shadow */
+    table-layout: auto; /* Allow columns to adjust dynamically */
+    width: 100%; /* Ensure table spans the full width */
 }
 
 /* Optional: Add padding and border styles for table cells */
@@ -510,6 +523,13 @@ table th {
     font-weight: bold; /* Bold text for headers */
     color: white;
 }
+
+#dashboard-table th {
+    background-color: #6a6c6d !important; /* Light gray background for headers */
+    font-weight: bold; /* Bold text for headers */
+    color: white;
+}
+
 .tab-pane {
     border: 1px solid lightgray; /* Add a light gray border */
     padding-left: 10px; /* Reduce left padding */
@@ -528,6 +548,13 @@ table th {
     box-sizing: border-box; /* Include padding and border in the width */
 }
 
+.dashboard-table-responsive {
+    overflow-x: auto; /* Enable horizontal scrolling */
+    margin-left: 0; /* Remove left margin */
+    margin-right: 0; /* Remove right margin */
+}
+
+
 .table-responsive {
     overflow-x: auto; /* Enable horizontal scrolling */
     margin-left: 0; /* Remove left margin */
@@ -537,6 +564,22 @@ table th {
 table.data-table th, table.data-table td {
     white-space: nowrap; /* Prevent text wrapping */
 }
+
+/* Ensure consistent table widths */
+table {
+    table-layout: fixed; /* Force consistent column widths */
+    width: 100%; /* Ensure table spans the full width */
+}
+
+table th, table td {
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflow content */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+}
+
+
+
+
 
 .card-header {
     display: flex; /* Use flexbox for alignment */
@@ -937,69 +980,71 @@ table.data-table th, table.data-table td {
     width: 180px !important;  /* Set fixed width for search box */
 }
 
-.dt-buttons {
-    display: inline-flex !important;
-    flex-wrap: nowrap !important;
-    gap: 3px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    align-items: center !important;
+/* Force table width synchronization */
+table {
+    table-layout: fixed;
+    width: 100%;
 }
-
-.dt-buttons .btn {
-    padding: 2px 8px !important;
-    font-size: 0.75rem !important;
-    margin: 0 !important;
-    height: 24px !important;
-    line-height: 20px !important;
-    min-width: 45px !important;
-    max-width: 65px !important;
-}
-
-/* Remove extra spacing */
-.dataTables_wrapper .row {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-
-.dataTables_wrapper .col-sm-12 {
-    padding-left: 5px !important;
-    padding-right: 5px !important;
-}
-
-/* Table column width fixes */
-.data-table th,
-.data-table td {
+table th, table td {
     white-space: nowrap;
-    padding: 8px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
 }
 
-/* .min-w-150 {
-    min-width: 150px !important;
-} */
-
-.data-table {
-    width: 100% !important;
+/* Ensure DataTable scrolls horizontally if needed */
+.dataTables_wrapper {
+    overflow-x: auto;
 }
 
-.dataTables_scrollHead,
-.dataTables_scrollBody {
-    width: 100% !important;
+/* Align DataTable buttons and search box */
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+}
+.dataTables_wrapper .dataTables_length {
+    float: left;
+    text-align: left;
 }
 
-/* Form field styling */
-.form-control[readonly] {
-    background-color: #f8f9fa !important;  /* Light gray background */
-    border-color: #dee2e6 !important;
-    color: #495057 !important;             /* Dark gray text */
-    cursor: default !important;
+/* Adjust pagination styling */
+.dataTables_paginate {
+    margin-top: 10px;
 }
 
-/* Style all form inputs consistently */
-.form-control-sm {
-    height: calc(1.5em + 0.5rem + 2px) !important;
-    padding: 0.25rem 0.5rem !important;
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
-    border-radius: 0.2rem !important;
+/* Loading state for charts */
+.chart-container {
+    position: relative;
+    min-height: 200px;
+}
+
+.chart-container.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+}
+
+.chart-container.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 3px solid #0d6efd;
+    animation: spin 1s linear infinite;
+    z-index: 2;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import index, filtered_chart_data, worklist_view, serve_document, update_workflow
+from main.views import index, filtered_chart_data, worklist_view, serve_document, update_workflow, insights_view, daily_transactions_chart_data
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -29,6 +29,8 @@ urlpatterns = [
     path('documents/<str:doc_type>/<str:invoice_number>/', serve_document, name='serve_document'),
     # path('api/deductions/update/', update_workflow, name='update_deduction'),  # Add this line
     path('update_workflow/', update_workflow, name='update_workflow'),
+    path('insights/', insights_view, name='insights'),
+    path('api/daily-transactions/', daily_transactions_chart_data, name='daily-transactions-data'),
     
 
 ]

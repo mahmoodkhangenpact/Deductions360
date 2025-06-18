@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    // Initialize DataTables with browser-agnostic options
+    // Ensure consistent DataTable configuration with charts.js
     const tables = $('table.data-table').DataTable({
         dom: '<"d-flex align-items-center justify-content-between mb-3"<"d-flex align-items-center"l<"ml-2"B>>f>' +
              '<"row"<"col-sm-12"tr>>' +

@@ -1,9 +1,3 @@
-import os
-import django
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'deductions360.settings')
-django.setup()
-
 from osd.models import workflow
 import datetime
 records = workflow.objects.all()
@@ -14,3 +8,4 @@ for record in records:
         print(f"Record ID {record.id} has date_worked as a date: {record.date_worked}")
     else:
         print(f"Record ID {record.id} has an unexpected type for date_worked: {type(record.date_worked)}")
+
