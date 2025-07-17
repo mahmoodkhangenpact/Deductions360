@@ -17,6 +17,7 @@ import zipfile
 # from .utils import create_document_package
 from wsgiref.util import FileWrapper
 import random
+from django.http import JsonResponse
 
 @login_required(login_url='login') 
 def index(request):
@@ -92,7 +93,7 @@ def index(request):
     
     return render(request, 'index.html', context)
 
-from django.http import JsonResponse
+
 
 def daily_transactions_chart_data(request):
     daily_data = (
@@ -360,7 +361,7 @@ def update_workflow(request):
             'error': str(e)
         }, status=500)
 
-@login_required(login_url='login')
+
 def create_document_package(invoice_number):
     """
     Create a zip package containing all documents for a given invoice number

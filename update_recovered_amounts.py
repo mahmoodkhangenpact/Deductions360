@@ -1,19 +1,13 @@
-import os
-import django
-import random
-from osd.models import Deductions
+from osd.models import workflow
+from datetime import datetime
 
-# Set up Django environment
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'deductions360.settings')
-django.setup()
-
-def update_recovered_amounts():
-    deductions = Deductions.objects.filter(invalid_amount__gt=0)
-    for deduction in deductions:
-        recovery_percentage = random.uniform(0.8, 1.0)  # Random percentage between 80% and 100%
-        deduction.recovered_amount = deduction.invalid_amount * recovery_percentage
-        deduction.save()
-
-if __name__ == "__main__":
-    update_recovered_amounts()
-    print("Recovered amounts updated successfully.")
+records = workflow.objects.all()
+for record in records:
+    if record.deduction_date:
+        try:
+            # Convert mm/dd/yyyy to yyyy-mm-dd
+            formatted_date = datetime.strptime(record.deduction_date, '%m/%d/%Y').date()
+            record.deduction_date = formatted_date
+            record.save()
+        except ValueError:
+            print(f"Invalid date format for record {record.id}: {record.deduction_date}")
