@@ -240,7 +240,7 @@ def worklist_view(request):
 
     # Define fields to hide
     hidden_fields = ['id', 'ids', 'invalid_amt_1', 'invalid_amt_2', 'invalid_amt_3', 'invalid_amt_4', 'product_substitution', 'combined_shipment',
-                     'order_split', 'load_sequencing', 'unit_of_measurement', 'deducted_at_higher_price']
+                     'order_split', 'load_sequencing', 'unit_of_measurement', 'deducted_at_higher_price', 'deduction_reason']
     readonly_fields = ['standard customer','deduction reference', 'invoice_number', 'deducted_amount', 'deducted_qty', 'deduction_date',
                         'deduction_reason', 'billed_qty', 'gross_price_per_qty','net price per qty','carrier', 'shortage', 'damage', 
                         'returns', 'overage', 'net_shortage', 'customer_sign', 'carrier_sign', 'subject_to_count', 'missing_data',
@@ -579,6 +579,11 @@ def insights_view(request):
     }
     
     return render(request, 'insights.html', context)
+
+@login_required(login_url='login')
+def rca_view(request):
+    return render(request, 'rca.html')
+
 
 def get_trends_data(queryset):
     trends = queryset.values('deduction_date')\

@@ -68,10 +68,11 @@
             <ul class="nav">
                
                <li class="nav-item">
-                  <a href="{% url 'worklist' %}" class="nav-link">
-                  <i class="fas fa-edit"></i> Worklist
+                  <a href="{% url 'rca' %}" class="nav-link">
+                  <i class="fas fa-chart-bar"></i> RCA
                   </a>
-               </li>               <li class="nav-item">
+               </li>
+               <li class="nav-item">
                   <a href="{% url 'insights' %}" class="nav-link">
                   <i class="fas fa-chart-bar"></i> Insights
                   </a>
@@ -81,6 +82,11 @@
                   <i class="fas fa-user"></i> Analyst
                   </a>
                </li>
+               <li class="nav-item">
+                  <a href="{% url 'worklist' %}" class="nav-link">
+                  <i class="fas fa-edit"></i> Worklist
+                  </a>
+               </li> 
             </ul>
          </div>
          <div class="main-content">

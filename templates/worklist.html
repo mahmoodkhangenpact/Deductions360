@@ -154,7 +154,9 @@ $(document).ready(function() {
                      </td>
                      {% elif field.name == 'validation_status' %}
                      <td data-field="{{ field.name }}">
-                        <span class="{% if item|getattr:field.name == 'Valid' %}text-success{% elif item|getattr:field.name == 'Invalid' %}text-danger{% elif item|getattr:field.name == 'Pending Validation' %}text-warning{% endif %}">
+                        <span class="{% if item|getattr:field.name == 'Valid' %}text-success
+                        {% elif item|getattr:field.name == 'Invalid' %}text-danger{% elif item|getattr:field.name == 'Pending Validation' %}
+                        text-warning{% endif %}">
                         {{ item|getattr:field.name }}
                         </span>
                      </td>
